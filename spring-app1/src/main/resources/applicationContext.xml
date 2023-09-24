@@ -10,10 +10,13 @@
     <context:property-placeholder location="classpath:musicPlayer.properties"/>
 
     <bean id="musicBean"
-        class="ru.crpshepard.springcourse.ClassicalMusic">
+        class="ru.crpshepard.springcourse.ClassicalMusic"
+        init-method="doMyInit"
+        destroy-method="doMyDestroy"
+        factory-method="getClassicalMusic">
     </bean>
 
-    <bean id="musicPlayer"
+    <!-- <bean id="musicPlayer"
         class="ru.crpshepard.springcourse.MusicPlayer"
         scope="prototype">
         <property name="music" ref="musicBean"/>
@@ -21,6 +24,6 @@
         <property name="name" value="${musicPlayer.name}"/>
         <property name="volume" value="${musicPlayer.volume}"/>
 
-    </bean>
+    </bean> -->
 
 </beans>
