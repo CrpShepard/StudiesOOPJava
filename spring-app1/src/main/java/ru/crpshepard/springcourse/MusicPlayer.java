@@ -1,13 +1,20 @@
 package ru.crpshepard.springcourse;
 
-public class MusicPlayer {
-    private Music music;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-    public MusicPlayer(Music music) {
-        this.music = music;
+@Component
+public class MusicPlayer {
+    private ClassicalMusic classicalMusic;
+    private RockMusic rockMusic;
+
+    @Autowired
+    public MusicPlayer(ClassicalMusic classicalMusic, RockMusic rockMusic) {
+        this.classicalMusic = classicalMusic;
+        this.rockMusic = rockMusic;
     }
 
-    public void playMusic() {
-        System.out.println("Playing: " + music.getSong());
+    public String playMusic() {
+        return "Playing: " + classicalMusic.getSong();
     }
 }
