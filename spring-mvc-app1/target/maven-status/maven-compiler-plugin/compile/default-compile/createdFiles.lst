@@ -1,1 +1,3 @@
-ru\crpshepard\springcourse\HelloController.class
+ru\crpshepard\springcourse\config\MySpringMvcDispatcherServletInitializer.class
+ru\crpshepard\springcourse\config\SpringConfig.class
+ru\crpshepard\springcourse\controllers\FirstController.class
