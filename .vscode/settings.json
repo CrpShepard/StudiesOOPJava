@@ -1,0 +1,7 @@
+{
+    "java.project.sourcePaths": [
+        "spring-mvc-app1/src/main/java"
+    ],
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "java.compile.nullAnalysis.mode": "automatic"
+}
