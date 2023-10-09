@@ -36,9 +36,25 @@ public class FirstController {
         double result;
 
         switch(action) {
-            case 
+            case "multiplication":
+                result = a * b;
+                break;
+            case "division":
+                result = a / b;
+                break;
+            case "subtraction":
+                result = a - b;
+                break;
+            case "addition":
+                result = a + b;
+                break;
+            default:
+                result = 0;
+                break;
         }
 
-        return "";
+        model.addAttribute("result", result);
+
+        return "first/calculator";
     }
 }
