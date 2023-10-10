@@ -1,0 +1,5 @@
+ru\crpshepard\springcourse\config\MySpringMvcDispatcherServletInitializer.class
+ru\crpshepard\springcourse\config\SpringConfig.class
+ru\crpshepard\springcourse\controllers\PeopleController.class
+ru\crpshepard\springcourse\models\Person.class
+ru\crpshepard\springcourse\dao\PersonDAO.class
