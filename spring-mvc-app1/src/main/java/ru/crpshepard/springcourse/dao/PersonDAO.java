@@ -4,6 +4,7 @@ import ru.crpshepard.springcourse.models.Person;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -33,7 +34,6 @@ public class PersonDAO {
         try {
             connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
@@ -57,7 +57,6 @@ public class PersonDAO {
                 people.add(person);
             }
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
@@ -65,45 +64,68 @@ public class PersonDAO {
     }
 
     public Person show(int id) {
-        // System.out.println("Person show()");
-        // for (int i = 0; i < people.size(); i++) {
-        //     if (i == id - 1) {
-        //         System.out.println(people.get(i).getId());
-        //         System.out.println(people.get(i).getName());
-        //         return people.get(i);
-        //     }
-        // }
 
-         return null;
+        Person person = null;
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM Person WHERE id=?");
+
+            preparedStatement.setInt(1, id);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            resultSet.next();
+
+            person = new Person();
+
+            person.setId(resultSet.getInt("id"));
+            person.setName(resultSet.getString("name"));
+            person.setAge(resultSet.getInt("age"));
+            person.setEmail(resultSet.getString("email"));
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+         return person;
     }
 
     public void save(Person person) {
-        // person.setId(++PEOPLE_COUNT);
-        // people.add(person);
-
         try {
-            Statement statement = connection.createStatement();
-            String SQL = "INSERT INTO Person VALUES(" + 1 + ",'" + person.getName() + "'," + person.getAge() + ",'" + person.getEmail() + "')";
-            statement.executeUpdate(SQL);
+            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO Person VALUES(1, ?, ?, ?)");
+
+            preparedStatement.setString(1, person.getName());
+            preparedStatement.setInt(2, person.getAge());
+            preparedStatement.setString(3, person.getEmail());
+
+            preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
 
     public void update(int id, Person updatedPerson) {
-        // Person personToBeUpdated = show(id);
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement("UPDATE Person SET name=?, age=?, email=? WHERE id=?");
 
-        // personToBeUpdated.setName(updatedPerson.getName());
-        // personToBeUpdated.setAge(updatedPerson.getAge());
-        // personToBeUpdated.setEmail(updatedPerson.getEmail());
+            preparedStatement.setString(1, updatedPerson.getName());
+            preparedStatement.setInt(2, updatedPerson.getAge());
+            preparedStatement.setString(3, updatedPerson.getEmail());
+            preparedStatement.setInt(4, id);
+
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void delete(int id) {
-        // for (int i = 0; i < people.size(); i++) {
-        //     if (i == id - 1) {
-        //         people.remove(i);
-        //     }
-        // }
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM Person WHERE id=?");
+
+            preparedStatement.setInt(1, id);
+
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
