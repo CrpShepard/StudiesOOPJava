@@ -12,6 +12,8 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 
 public class GameClient {
     public static void main(String[] args) throws Exception{
+        GameWindow gameWindow = new GameWindow(); // Запуск игрового окна
+        gameWindow.repaint();
         new GameClient("localhost", 8000).run();
     }
 
@@ -36,14 +38,14 @@ public class GameClient {
             ChannelFuture lastWriteFuture = null;
             BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 
-            while(true) {
-                String line = in.readLine();
-                if (line == null) {
-                    break;
-                }
+            // while(true) {
+            //     String line = in.readLine();
+            //     if (line == null) {
+            //         break;
+            //     }
 
-                lastWriteFuture = channel.writeAndFlush(line + "\r\n");
-            }
+            //     lastWriteFuture = channel.writeAndFlush(line + "\r\n");
+            // }
 
             if (lastWriteFuture != null) {
                 lastWriteFuture.sync();
