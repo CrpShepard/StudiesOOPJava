@@ -13,7 +13,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 public class GameClient {
     public static void main(String[] args) throws Exception{
         GameWindow gameWindow = new GameWindow(); // Запуск игрового окна
-        gameWindow.repaint();
+        
         new GameClient("localhost", 8000).run();
     }
 
