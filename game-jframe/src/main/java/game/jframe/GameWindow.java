@@ -17,22 +17,27 @@ import java.awt.event.MouseEvent;
 
 public class GameWindow{
     JFrame frame;
+    GamePanel gamePanel;
     private int WindowW = 1024;
     private int WindowH = 768;
+    public int unitAmount = 3;
+    public boolean[] restart = new boolean[unitAmount];
     
     public GameWindow() {
-        frame = new JFrame("GameWindow");   
-        frame.add(new GamePanel());  
+        frame = new JFrame("GameWindow");
+        gamePanel = new GamePanel();
+        frame.add(gamePanel);   
         frame.setSize(WindowW, WindowH);  
         frame.setLocationRelativeTo(null);  
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);  
         frame.setVisible(true);
+    }
 
-        System.out.println("GameWindow()");
+    public void setTarget(int index, int x, int y) {
+        gamePanel.setTarget(index, x, y);
     }
 
     class GamePanel extends JPanel {
-        private int unitAmount = 3;
         private int[][] unitsCoord = new int[unitAmount][2];
         
         private int squareW = 20;
@@ -45,7 +50,6 @@ public class GameWindow{
         private int[] duration = new int[unitAmount];
         private long[] startTime = new long[unitAmount];
         private boolean[] started = new boolean[unitAmount];
-        private boolean[] restart = new boolean[unitAmount];
         private double[] progress = new double[unitAmount];
 
         public GamePanel() {
@@ -57,12 +61,6 @@ public class GameWindow{
                     long[] curr_duration = new long[unitAmount];
 
                     for (int i = 0; i < unitAmount; i++) {
-                        if (restart[i]) {
-                            setTarget(i);
-                            findDuration(i);
-                            started[i] = false;
-                            restart[i] = false;
-                        }
                         if (!started[i]) {
                             startTime[i] = System.currentTimeMillis();
                             started[i] = true;
@@ -115,12 +113,16 @@ public class GameWindow{
             unitsCoord[index][1] = y;
         }
 
-        void setTarget(int index) {
-            targetsCoord[index][0] = ThreadLocalRandom.current().nextInt(0, WindowW);
-            targetsCoord[index][1] = ThreadLocalRandom.current().nextInt(0, WindowH);
+        void setTarget(int index, int x, int y) {
+            targetsCoord[index][0] = x;
+            targetsCoord[index][1] = y;
 
             unitsStartCoord[index][0] = unitsCoord[index][0];
             unitsStartCoord[index][1] = unitsCoord[index][1];
+
+            findDuration(index);
+            started[index] = false;
+            restart[index] = false;
 
             System.out.println("New target for unit " + index + " X: " + targetsCoord[index][0] + " Y: " + targetsCoord[index][1]);
         }

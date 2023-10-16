@@ -1,5 +1,7 @@
 package game.jframe;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -7,7 +9,7 @@ import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.util.concurrent.GlobalEventExecutor;
 
-public class GameServerHandler extends SimpleChannelInboundHandler<String>{
+public class GameServerHandler extends SimpleChannelInboundHandler<Integer>{
 
     private static final ChannelGroup channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
@@ -32,14 +34,24 @@ public class GameServerHandler extends SimpleChannelInboundHandler<String>{
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, String message) throws Exception {
-        System.out.println(ctx.channel().toString() + " messaged: " + message);
+    protected void channelRead0(ChannelHandlerContext ctx, Integer message) throws Exception {
         
-        for (Channel channel : channels) {
-            if (channel != ctx.channel()) {
-                channel.writeAndFlush("[" + ctx.channel().remoteAddress() + "] " + message + "\n"); 
-            }
-        }
+            System.out.println(ctx.channel().toString() + " messaged: " + message.toString());
+        
+        // for (Channel channel : channels) {
+        //     if (channel != ctx.channel()) {
+        //         channel.writeAndFlush("[" + ctx.channel().remoteAddress() + "] " + message + "\n"); 
+        //     }
+        // }
+
+            int x = ThreadLocalRandom.current().nextInt(0, 1024);
+            int y = ThreadLocalRandom.current().nextInt(0, 768);
+            int[] coords = new int[3];
+            coords[0] = message; coords[1] = x; coords[2] = y;
+
+            ctx.channel().writeAndFlush(coords);
+        
+        
     }
     
 }
