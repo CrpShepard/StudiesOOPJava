@@ -5,9 +5,6 @@ import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -53,11 +50,13 @@ public class GameClient {
             // }
 
             while(true) {
-                for (int i = 0; i < gameWindow.unitAmount; i++) {
-                    if (gameWindow.restart[i]) {
-                        channel.writeAndFlush(i);
-                    }
-                }
+                // for (int i = 0; i < gameWindow.unitAmount; i++) {
+                //     if (gameWindow.restart[i]) {
+                //         channel.writeAndFlush(i);
+                //     }
+                // }
+
+                //if ()
                 Thread.sleep(500);
             }
                         

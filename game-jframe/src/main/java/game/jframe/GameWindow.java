@@ -20,8 +20,10 @@ public class GameWindow{
     GamePanel gamePanel;
     private int WindowW = 1024;
     private int WindowH = 768;
-    public int unitAmount = 3;
+    public int unitAmount;
     public boolean[] restart = new boolean[unitAmount];
+
+    public int playerId;
     
     public GameWindow() {
         frame = new JFrame("GameWindow");
