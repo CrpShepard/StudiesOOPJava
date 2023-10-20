@@ -1,4 +1,4 @@
-package game.jframe;
+package game.jframe.Decoders;
 
 import java.util.List;
 

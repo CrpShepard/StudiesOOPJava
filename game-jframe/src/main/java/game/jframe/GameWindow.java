@@ -1,6 +1,10 @@
 package game.jframe;
 
 import javax.swing.*;
+
+import game.jframe.MessageClasses.AllPlayerMoveData;
+import game.jframe.MessageClasses.PlayerMoveData;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -10,6 +14,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.geom.Ellipse2D;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 import java.awt.FlowLayout;
@@ -20,10 +25,11 @@ public class GameWindow{
     GamePanel gamePanel;
     private int WindowW = 1024;
     private int WindowH = 768;
-    public int unitAmount;
-    public boolean[] restart = new boolean[unitAmount];
+    public ArrayList<Boolean> finished = new ArrayList<Boolean>(); // restart => finished
 
     public int playerId;
+    public boolean sentToServer = false;
+    public PlayerMoveData playerMoveData;
     
     public GameWindow() {
         frame = new JFrame("GameWindow");
@@ -35,117 +41,178 @@ public class GameWindow{
         frame.setVisible(true);
     }
 
-    public void setTarget(int index, int x, int y) {
-        gamePanel.setTarget(index, x, y);
+    public void setAllPlayerMoveData(AllPlayerMoveData allPlayerMoveData) {
+        gamePanel.setAllPlayerMoveData(allPlayerMoveData);
     }
 
+    public void setPlayerMoveData(PlayerMoveData playerMoveData) {
+        gamePanel.setPlayerMoveData(playerMoveData);
+    }
     class GamePanel extends JPanel {
-        private int[][] unitsCoord = new int[unitAmount][2];
+        private ArrayList<ArrayList<Integer>> unitsCoord = new ArrayList<ArrayList<Integer>>();
+
+        private int playerCount;
         
         private int squareW = 20;
         private int squareH = 20;
 
-        private int[][] unitsStartCoord = new int[unitAmount][2];
-        private int[][] targetsCoord = new int[unitAmount][2];
+        private ArrayList<ArrayList<Integer>> unitsStartCoord = new ArrayList<ArrayList<Integer>>();
+        private ArrayList<ArrayList<Integer>> targetsCoord = new ArrayList<ArrayList<Integer>>();
         
-        private double[] moveSpeed = new double[unitAmount];
-        private int[] duration = new int[unitAmount];
-        private long[] startTime = new long[unitAmount];
-        private boolean[] started = new boolean[unitAmount];
-        private double[] progress = new double[unitAmount];
+        private ArrayList<Float> moveSpeed = new ArrayList<Float>();
+        private ArrayList<Integer> duration = new ArrayList<Integer>();
+        private ArrayList<Long> startTime = new ArrayList<Long>();
+        private ArrayList<Boolean> started = new ArrayList<Boolean>();
+        private ArrayList<Double> progress = new ArrayList<Double>();
+
+        private Timer timer;
 
         public GamePanel() {
             setBorder(BorderFactory.createLineBorder(Color.black));
-            setDefaultValues();
-            Timer timer = new Timer(40, new ActionListener() {
+            //setDefaultValues();
+
+            addMouseListener(new MouseAdapter() {
+                public void mousePressed(MouseEvent e) {
+                    setTarget(playerId, e.getX(), e.getY());
+                }
+            });
+
+            // Timer timer = new Timer(40, new ActionListener() {
+            //     @Override
+            //     public void actionPerformed(ActionEvent e) {
+            //         ArrayList<Long> curr_duration = new ArrayList<Long>();
+
+            //         for (int i = 0; i < playerCount; i++) {
+            //             long time = System.currentTimeMillis();
+            //             if (started.get(i) && !finished.get(i)) {
+            //                 curr_duration.set(i, time - startTime.get(i));
+            //                 if (curr_duration.get(i) > duration.get(i)) {
+            //                     curr_duration.set(i, (long) duration.get(i));
+            //                     finished.set(i, true);
+            //                 }
+            //                 progress.set(i, (double)curr_duration.get(i) / (double)duration.get(i));
+            //                 moveRect(i);
+            //                 repaint();
+            //             }
+            //         }
+            //     }
+            // });
+            // timer.start();
+           
+        }
+
+        // void setDefaultValues() {
+        //     started.set(playerId, false);
+        //     finished.set(playerId, true);
+        //     //playerCount = unitsCoord.size();
+        //     //sentToServer = false;
+        // }
+
+        void setAllPlayerMoveData(AllPlayerMoveData allPlayerMoveData) {
+            this.unitsCoord = allPlayerMoveData.playerCoord;
+            this.unitsStartCoord = allPlayerMoveData.playerStartCoord;
+            this.targetsCoord = allPlayerMoveData.playerTargetCoord;
+            this.moveSpeed = allPlayerMoveData.playerMoveSpeed;
+            this.startTime = allPlayerMoveData.playerAnimStartTime;
+            this.started = allPlayerMoveData.playerAnimStarted;
+
+            playerCount = unitsCoord.size();
+
+            started.set(playerId, false);
+            finished.set(playerId, true);
+
+            for (int i = 0; i < playerCount; i++) {
+                if (i != playerId) {
+                    if (started.get(i)) {
+                        findDuration(i);
+                        finished.set(i, false);
+                    }
+                }
+            }
+
+
+            if(timer.isRunning())
+                timer.stop();
+
+            timer = new Timer(40, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    long[] curr_duration = new long[unitAmount];
+                    ArrayList<Long> curr_duration = new ArrayList<Long>();
 
-                    for (int i = 0; i < unitAmount; i++) {
-                        if (!started[i]) {
-                            startTime[i] = System.currentTimeMillis();
-                            started[i] = true;
-                        }
+                    for (int i = 0; i < playerCount; i++) {
                         long time = System.currentTimeMillis();
-                        curr_duration[i] = time - startTime[i];
-                        if (curr_duration[i] > duration[i]) {
-                            curr_duration[i] = duration[i];
-                            restart[i] = true;
+                        if (started.get(i) && !finished.get(i)) {
+                            curr_duration.set(i, time - startTime.get(i));
+                            if (curr_duration.get(i) > duration.get(i)) {
+                                curr_duration.set(i, (long) duration.get(i));
+                                finished.set(i, true);
+                            }
+                            progress.set(i, (double)curr_duration.get(i) / (double)duration.get(i));
+                            moveRect(i);
+                            repaint();
                         }
-                        progress[i] = (double)curr_duration[i] / (double)duration[i];
-                        moveRect(i);
-                        repaint();
                     }
                 }
             });
             timer.start();
-
-            // addMouseListener(new MouseAdapter() { // на будущее
-            //     public void mousePressed(MouseEvent e) {
-            //         moveSquare(e.getX(),e.getY());
-            //     }
-            // });
-
-            // addMouseMotionListener(new MouseAdapter() {
-            //     public void mouseDragged(MouseEvent e) {
-            //         moveSquare(e.getX(),e.getY());
-            //     }
-            // });
         }
 
-        void setDefaultValues() {
-            for (int i = 0; i < unitAmount; i++) { // UnitsCoord, moveSpeed, started, restart
-                int x = ThreadLocalRandom.current().nextInt(0, WindowW);
-                int y = ThreadLocalRandom.current().nextInt(0, WindowH);
-                unitsCoord[i][0] = x;
-                unitsCoord[i][1] = y;
+        void setPlayerMoveData(PlayerMoveData playerMoveData) {
+            unitsCoord.get(playerMoveData.getId()).set(0, playerMoveData.getCoordX());
+            unitsCoord.get(playerMoveData.getId()).set(1, playerMoveData.getCoordY());
 
-                moveSpeed[i] = 0.1f;
-                started[i] = false;
-                restart[i] = true;
-            }
+            unitsStartCoord.get(playerMoveData.getId()).set(0, playerMoveData.getStartCoordX());
+            unitsStartCoord.get(playerMoveData.getId()).set(1, playerMoveData.getStartCoordY());
+
+            targetsCoord.get(playerMoveData.getId()).set(0, playerMoveData.getTargetCoordX());
+            targetsCoord.get(playerMoveData.getId()).set(1, playerMoveData.getTargetCoordY());
+
+            startTime.set(playerMoveData.getId(), playerMoveData.getAnimStartTime());
+            started.set(playerMoveData.getId(), playerMoveData.isAnimStarted());
+
+            findDuration(playerMoveData.getId());
+            finished.set(playerMoveData.getId(), false);
         }
 
         protected void moveRect(int index) {
-            int x = (int)Math.round(unitsStartCoord[index][0] + ((targetsCoord[index][0] - unitsStartCoord[index][0]) * progress[index]));
-            int y = (int)Math.round(unitsStartCoord[index][1] + ((targetsCoord[index][1] - unitsStartCoord[index][1]) * progress[index]));
+            int x = (int)Math.round(unitsStartCoord.get(index).get(0) + ((targetsCoord.get(index).get(0) - unitsStartCoord.get(index).get(0)) * progress.get(index)));
+            int y = (int)Math.round(unitsStartCoord.get(index).get(1) + ((targetsCoord.get(index).get(1) - unitsStartCoord.get(index).get(1)) * progress.get(index)));
 
-            unitsCoord[index][0] = x;
-            unitsCoord[index][1] = y;
+            unitsCoord.get(index).set(0, x);
+            unitsCoord.get(index).set(1, y);
         }
 
         void setTarget(int index, int x, int y) {
-            targetsCoord[index][0] = x;
-            targetsCoord[index][1] = y;
+            targetsCoord.get(index).set(0, x);
+            targetsCoord.get(index).set(1, y);
 
-            unitsStartCoord[index][0] = unitsCoord[index][0];
-            unitsStartCoord[index][1] = unitsCoord[index][1];
+            unitsStartCoord.get(index).set(0, unitsCoord.get(index).get(0));
+            unitsStartCoord.get(index).set(1, unitsCoord.get(index).get(1));
 
             findDuration(index);
-            started[index] = false;
-            restart[index] = false;
+            started.set(index, true);
+            startTime.set(index, System.currentTimeMillis());
+            finished.set(index, false);
 
-            System.out.println("New target for unit " + index + " X: " + targetsCoord[index][0] + " Y: " + targetsCoord[index][1]);
+            playerMoveData.setCoordX(unitsCoord.get(index).get(0));
+            playerMoveData.setCoordY(unitsCoord.get(index).get(1));
+            playerMoveData.setStartCoordX(unitsStartCoord.get(index).get(0));
+            playerMoveData.setStartCoordY(unitsStartCoord.get(index).get(1));
+            playerMoveData.setTargetCoordX(x);
+            playerMoveData.setTargetCoordY(y);
+            playerMoveData.setAnimStartTime(startTime.get(index));
+            playerMoveData.setAnimStarted(true);
+            playerMoveData.setId(playerId);
+
+            sentToServer = true;
         }
 
         void findDuration(int index) {
-            duration[index] = (int) Math.round(
+            duration.set(index,(int) Math.round(
                 Math.sqrt(
-                    Math.pow((targetsCoord[index][0] - unitsCoord[index][0]), 2) + 
-                    Math.pow((targetsCoord[index][1] - unitsCoord[index][1]), 2)) / moveSpeed[index]);
-        }
-    
-        // private void moveSquare(int x, int y) {
-        //     int OFFSET = 1;
-        //     if ((squareX!=x) || (squareY!=y)) {
-        //         repaint(squareX,squareY,squareW+OFFSET,squareH+OFFSET);
-        //         squareX=x;
-        //         squareY=y;
-        //         repaint(squareX,squareY,squareW+OFFSET,squareH+OFFSET);
-        //     } 
-        // }
-    
+                    Math.pow((targetsCoord.get(index).get(0) - unitsCoord.get(index).get(0)), 2) + 
+                    Math.pow((targetsCoord.get(index).get(1) - unitsCoord.get(index).get(1)), 2)) / moveSpeed.get(index)));
+        }    
 
         public Dimension getPreferredSize() {
             return new Dimension(WindowW, WindowH);
@@ -154,7 +221,7 @@ public class GameWindow{
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);       
 
-            for (int i = 0; i < unitAmount; i++) {
+            for (int i = 0; i < playerCount; i++) {
                 Color color;
 
                 switch (i){
@@ -174,9 +241,9 @@ public class GameWindow{
                 }
 
                 g.setColor(color);
-                g.fillRect(unitsCoord[i][0], unitsCoord[i][1], squareW, squareH);
+                g.fillRect(unitsCoord.get(i).get(0), unitsCoord.get(i).get(1), squareW, squareH);
                 g.setColor(Color.BLACK);
-                g.drawRect(unitsCoord[i][0], unitsCoord[i][1], squareW, squareH);
+                g.drawRect(unitsCoord.get(i).get(0), unitsCoord.get(i).get(1), squareW, squareH);
             }
         }  
     }

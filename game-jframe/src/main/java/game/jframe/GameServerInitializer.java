@@ -1,5 +1,12 @@
 package game.jframe;
 
+import game.jframe.Decoders.IntegerDecoder;
+import game.jframe.Decoders.PlayerIdDecoder;
+import game.jframe.Decoders.PlayerMoveDataDecoder;
+import game.jframe.Encoders.AllPlayerMoveDataEncoder;
+import game.jframe.Encoders.IntArrayEncoder;
+import game.jframe.Encoders.PlayerIdEncoder;
+import game.jframe.Encoders.PlayerMoveDataEncoder;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
@@ -13,12 +20,10 @@ public class GameServerInitializer extends ChannelInitializer<SocketChannel>{
     protected void initChannel(SocketChannel arg0) throws Exception {
         ChannelPipeline pipeline = arg0.pipeline();
 
-        //pipeline.addLast("framer", new DelimiterBasedFrameDecoder(8192, Delimiters.lineDelimiter()));
-        //pipeline.addLast("decoder", new StringDecoder());
-        //pipeline.addLast("encoder", new StringEncoder());
-
-        pipeline.addLast(new IntArrayEncoder());
-        pipeline.addLast(new IntegerDecoder());
+        pipeline.addLast(new PlayerIdEncoder());
+        pipeline.addLast(new AllPlayerMoveDataEncoder());
+        pipeline.addLast(new PlayerMoveDataEncoder());
+        pipeline.addLast(new PlayerMoveDataDecoder());
 
         pipeline.addLast("handler", new GameServerHandler());
     }

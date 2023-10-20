@@ -38,26 +38,18 @@ public class GameClient {
                 .handler(new GameClientInitializer(gameWindow));
 
             Channel channel = bootstrap.connect(host, port).sync().channel();
-            BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-
-            // while(true) { // для передачи строковых сообщений через консоль
-            //     String line = in.readLine();
-            //     if (line == null) {
-            //         break;
-            //     }
-
-            //     lastWriteFuture = channel.writeAndFlush(line + "\r\n");
-            // }
+            // BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 
             while(true) {
-                // for (int i = 0; i < gameWindow.unitAmount; i++) {
-                //     if (gameWindow.restart[i]) {
-                //         channel.writeAndFlush(i);
-                //     }
-                // }
+                if (gameWindow.sentToServer) {
+                    channel.writeAndFlush(gameWindow.playerMoveData);
 
-                //if ()
-                Thread.sleep(500);
+                    gameWindow.sentToServer = false;
+
+                    System.out.println("sent to server!");
+                }
+
+                Thread.sleep(200);
             }
                         
         } finally {
