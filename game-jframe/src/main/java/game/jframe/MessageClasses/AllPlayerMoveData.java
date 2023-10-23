@@ -1,9 +1,14 @@
 package game.jframe.MessageClasses;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-public class AllPlayerMoveData implements Serializable{
+public class AllPlayerMoveData extends MyMessage{
     public ArrayList<Boolean> playerAnimStarted;
     public ArrayList<Long> playerAnimStartTime;
 
@@ -12,9 +17,13 @@ public class AllPlayerMoveData implements Serializable{
     public ArrayList<ArrayList<Integer>> playerTargetCoord;
     public ArrayList<Float> playerMoveSpeed;
 
-    public AllPlayerMoveData(ArrayList<Boolean> playerAnimStarted, ArrayList<Long> playerAnimStartTime,
-            ArrayList<ArrayList<Integer>> playerCoord, ArrayList<ArrayList<Integer>> playerStartCoord,
-            ArrayList<ArrayList<Integer>> playerTargetCoord, ArrayList<Float> playerMoveSpeed) {
+    public AllPlayerMoveData(
+        ArrayList<Boolean> playerAnimStarted, 
+        ArrayList<Long> playerAnimStartTime,
+            ArrayList<ArrayList<Integer>> playerCoord, 
+            ArrayList<ArrayList<Integer>> playerStartCoord,
+            ArrayList<ArrayList<Integer>> playerTargetCoord, 
+            ArrayList<Float> playerMoveSpeed) {
         this.playerAnimStarted = playerAnimStarted;
         this.playerAnimStartTime = playerAnimStartTime;
         this.playerCoord = playerCoord;
@@ -41,4 +50,19 @@ public class AllPlayerMoveData implements Serializable{
 
         playerMoveSpeed.add(0.1f);
     }
+
+    //  public byte[] serialize() throws IOException {
+    //     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+    //     ObjectOutputStream out = new ObjectOutputStream(byteArrayOutputStream);
+    //     out.writeObject(this);
+    //     out.flush();
+    //     return byteArrayOutputStream.toByteArray();
+    // }
+
+    // // Статический метод для десериализации объекта из байтов
+    // public static AllPlayerMoveData deserialize(byte[] data) throws IOException, ClassNotFoundException {
+    //     ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(data);
+    //     ObjectInputStream in = new ObjectInputStream(byteArrayInputStream);
+    //     return (AllPlayerMoveData) in.readObject();
+    // }
 }

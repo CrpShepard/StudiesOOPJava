@@ -29,7 +29,7 @@ public class GameWindow{
 
     public int playerId;
     public boolean sentToServer = false;
-    public PlayerMoveData playerMoveData;
+    public PlayerMoveData playerMoveData = new PlayerMoveData();
     
     public GameWindow() {
         frame = new JFrame("GameWindow");
@@ -64,6 +64,8 @@ public class GameWindow{
         private ArrayList<Long> startTime = new ArrayList<Long>();
         private ArrayList<Boolean> started = new ArrayList<Boolean>();
         private ArrayList<Double> progress = new ArrayList<Double>();
+
+        ArrayList<Long> curr_duration = new ArrayList<Long>();
 
         private Timer timer;
 
@@ -116,12 +118,21 @@ public class GameWindow{
             this.startTime = allPlayerMoveData.playerAnimStartTime;
             this.started = allPlayerMoveData.playerAnimStarted;
 
+            System.out.println("void setAllPlayerMoveData" + '\n' +
+            unitsCoord + '\n' + unitsStartCoord + '\n' + targetsCoord + '\n' + targetsCoord + '\n' + moveSpeed + '\n' + startTime + '\n' + started + '\n');
+
             playerCount = unitsCoord.size();
+            System.out.println("PLAYER_COUNT " + playerCount);
 
             started.set(playerId, false);
-            finished.set(playerId, true);
+            
 
             for (int i = 0; i < playerCount; i++) {
+                finished.add(false);
+                duration.add(0);
+                progress.add((double) 0);
+                curr_duration.add((long) 0);
+
                 if (i != playerId) {
                     if (started.get(i)) {
                         findDuration(i);
@@ -130,14 +141,12 @@ public class GameWindow{
                 }
             }
 
-
-            if(timer.isRunning())
-                timer.stop();
+            initPlayerMoveData();
 
             timer = new Timer(40, new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    ArrayList<Long> curr_duration = new ArrayList<Long>();
+                    
 
                     for (int i = 0; i < playerCount; i++) {
                         long time = System.currentTimeMillis();
@@ -149,12 +158,25 @@ public class GameWindow{
                             }
                             progress.set(i, (double)curr_duration.get(i) / (double)duration.get(i));
                             moveRect(i);
-                            repaint();
+                            
                         }
                     }
+                    repaint();
                 }
             });
             timer.start();
+        }
+
+        void initPlayerMoveData() {
+            playerMoveData.setId(playerId);
+            playerMoveData.setCoordX(unitsCoord.get(playerId).get(0));
+            playerMoveData.setCoordY(unitsCoord.get(playerId).get(1));
+            playerMoveData.setStartCoordX(unitsStartCoord.get(playerId).get(0));
+            playerMoveData.setStartCoordY(unitsStartCoord.get(playerId).get(1));
+            playerMoveData.setTargetCoordX(targetsCoord.get(playerId).get(0));
+            playerMoveData.setTargetCoordY(targetsCoord.get(playerId).get(1));
+            playerMoveData.setAnimStarted(started.get(playerId));
+            playerMoveData.setAnimStartTime(startTime.get(playerId));
         }
 
         void setPlayerMoveData(PlayerMoveData playerMoveData) {

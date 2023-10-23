@@ -2,7 +2,7 @@ package game.jframe.MessageClasses;
 
 import java.io.Serializable;
 
-public class PlayerMoveData implements Serializable{
+public class PlayerMoveData extends MyMessage{
     private int id;
     
     private int startCoordX;
@@ -16,28 +16,6 @@ public class PlayerMoveData implements Serializable{
 
     private boolean animStarted;
     private long animStartTime;
-
-    public PlayerMoveData(
-        int id,
-        int startCoordX,
-        int startCoordY,
-        int targetCoordX, 
-        int targetCoordY, 
-        int coordX, 
-        int coordY, 
-        boolean animStarted,
-        long animStartTime) 
-        {
-        this.id = id;
-        this.startCoordX = startCoordX;
-        this.startCoordY = startCoordY;
-        this.targetCoordX = targetCoordX;
-        this.targetCoordY = targetCoordY;
-        this.coordX = coordX;
-        this.coordY = coordY;
-        this.animStarted = animStarted;
-        this.animStartTime = animStartTime;
-    }
 
     public int getId() {
         return id;

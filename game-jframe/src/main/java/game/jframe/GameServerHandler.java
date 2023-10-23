@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
 import game.jframe.MessageClasses.AllPlayerMoveData;
+import game.jframe.MessageClasses.MyMessage;
 import game.jframe.MessageClasses.PlayerId;
 import game.jframe.MessageClasses.PlayerMoveData;
 import io.netty.channel.Channel;
@@ -14,12 +15,12 @@ import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.util.concurrent.GlobalEventExecutor;
 
-public class GameServerHandler extends SimpleChannelInboundHandler{
+public class GameServerHandler extends SimpleChannelInboundHandler<Object>{
 
     private static final ChannelGroup channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
-    private ArrayList<SocketAddress> playerList = new ArrayList<SocketAddress>();
+    private static ArrayList<SocketAddress> playerList = new ArrayList<SocketAddress>();
 
-    AllPlayerMoveData allPlayerMoveData = new AllPlayerMoveData(
+    static AllPlayerMoveData allPlayerMoveData = new AllPlayerMoveData(
         new ArrayList<Boolean>(),
         new ArrayList<Long>(),
         new ArrayList<ArrayList<Integer>>(),
@@ -38,10 +39,21 @@ public class GameServerHandler extends SimpleChannelInboundHandler{
         PlayerId playerId = new PlayerId();
         playerId.id = playerList.size() - 1;
 
-        incoming.writeAndFlush(playerId);
-        incoming.writeAndFlush(allPlayerMoveData); // отправка данных о игроках подключившемуся
+        MyMessage message1 = playerId;
+        message1.type = "playerId";
 
-        System.out.println("channel added!" + ctx.channel().toString());
+        MyMessage message2 = allPlayerMoveData;
+        message2.type = "allPlayerMoveData";
+
+        incoming.writeAndFlush(message1);
+        // incoming.writeAndFlush(message2); // отправка данных о игроках подключившемуся
+
+        for (Channel channel : channels) {
+            channel.writeAndFlush(message2);
+        }
+
+        System.out.println("channel added!" + ctx.channel().toString() + '\n');
+        System.out.println("playerList " + playerList.toString() + '\n' + "allPlayerMoveData " + '\n' + allPlayerMoveData.playerCoord.toString());
     }
 
     @Override
@@ -72,9 +84,12 @@ public class GameServerHandler extends SimpleChannelInboundHandler{
             allPlayerMoveData.playerAnimStarted.set(msg.getId(), msg.isAnimStarted());
             allPlayerMoveData.playerAnimStartTime.set(msg.getId(), msg.getAnimStartTime());
 
+            MyMessage pmd = msg;
+            pmd.type = "playerMoveData";
+
             for (Channel channel : channels) {
                 if (channel != ctx.channel()) {
-                    channel.writeAndFlush(msg); // Отправка всем игрокам данные перемещения отправившего игрока
+                    channel.writeAndFlush(pmd); // Отправка всем игрокам данные перемещения отправившего игрока
                 }
             }
 
