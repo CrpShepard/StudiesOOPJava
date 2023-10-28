@@ -1,10 +1,16 @@
 package orm.task.springbootapp2.domain;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 
@@ -24,6 +30,17 @@ public class Phone {
 
   @Column(name = "os", nullable = false)
   private String os;    // We will also save the operating system running the phone
+
+  @OneToMany(mappedBy = "phone")
+  private List<Color> colors;
+
+  public List<Color> getColors() {
+    return colors;
+  }
+
+  public void setColors(List<Color> colors) {
+    this.colors = colors;
+  }
 
   /**
    * Our getters and setters for the attributes above
