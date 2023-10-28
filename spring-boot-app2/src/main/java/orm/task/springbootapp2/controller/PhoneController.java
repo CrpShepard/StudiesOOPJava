@@ -1,4 +1,4 @@
-package orm.task.springbootapp2;
+package orm.task.springbootapp2.controller;
 
 import java.util.HashMap;
 import java.util.List;
@@ -8,18 +8,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import orm.task.springbootapp2.domain.Phone;
+import orm.task.springbootapp2.repository.PhoneRepository;
 
-/**
- * The type Phone controller.
- *
- * @author Robley Gori - ro6ley.github.io
- */
 @RestController
 @RequestMapping("/api/v1")
 public class PhoneController {
 
-  @Autowired
+  //@Autowired
   private PhoneRepository phoneRepository;
+
+  @Autowired
+  public PhoneController(PhoneRepository phoneRepository) {
+    this.phoneRepository = phoneRepository;
+  }
 
   /**
    * Get all phones list.

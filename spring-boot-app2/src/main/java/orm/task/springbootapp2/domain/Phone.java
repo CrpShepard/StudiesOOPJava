@@ -1,26 +1,15 @@
-package orm.task.springbootapp2;
+package orm.task.springbootapp2.domain;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.EntityListeners;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 
-/**
- * This class will represent our phone and its attributes:
- * - ID
- * - Name
- * - Operating system
- * 
- * @author Robley Gori - ro6ley.github.io
- */
 @Entity
 @Table(name = "phones")   // the table in the database that will contain our phones data
-@EntityListeners(AuditingEntityListener.class)
 public class Phone {
   
   /**
