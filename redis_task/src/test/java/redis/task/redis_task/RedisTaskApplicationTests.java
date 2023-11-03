@@ -1,10 +1,10 @@
-package orm.task.springbootapp2;
+package redis.task.redis_task;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class SpringBootApp2ApplicationTests {
+class RedisTaskApplicationTests {
 
 	@Test
 	void contextLoads() {

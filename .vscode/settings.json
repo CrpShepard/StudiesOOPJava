@@ -2,6 +2,7 @@
     "java.compile.nullAnalysis.mode": "automatic",
     "java.configuration.updateBuildConfiguration": "interactive",
     "java.project.sourcePaths": [
-        "spring-boot-app2/src/main/java"
+        "spring-boot-app2/src/main/java",
+        "redis_task/src/main/java"
     ]
 }
